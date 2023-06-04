@@ -128,3 +128,10 @@ deltaSegun transformador estadoFinalUnaPersona estadoInicialUnaPersona = transfo
 
 nombre :: Rutina -> String
 nombre (unNombre, _ ,_) = unNombre
+
+--Punto 5:
+resumenesDeRutinasSaludables ::  Persona -> [Rutina] -> [Resumen]
+resumenesDeRutinasSaludables unaPersona = (map (flip resumenDeRutina unaPersona) . filter (flip laDejaSaludable unaPersona)) 
+
+laDejaSaludable :: Rutina -> Persona -> Bool
+laDejaSaludable unaRutina = (estaSaludable . hacerRutina unaRutina)

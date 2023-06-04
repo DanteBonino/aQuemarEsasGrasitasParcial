@@ -47,3 +47,46 @@ calcularPesoSegunCalorias unasCalorias unaPersona
   | esObesa unaPersona                             = (unasCalorias / 150)
   | tieneMasDe 30 unaPersona && unasCalorias > 200 =  1
   | otherwise                                      = (unasCalorias / (peso unaPersona) * (edad unaPersona))
+
+--Punto 3:
+--a
+type Ejercicio = Float -> Persona -> Persona
+type VelocidadPromedio = Float
+
+cinta :: VelocidadPromedio -> Ejercicio
+cinta velocidadPromedio unosMinutos = bajarDePeso (unosMinutos * velocidadPromedio)
+
+caminata :: Ejercicio
+caminata = cinta 5
+
+entrenamientoEnCinta :: Ejercicio
+entrenamientoEnCinta unosMinutos = cinta (velocidadPromedio (velocidadMaxima 6 unosMinutos) 6) unosMinutos
+
+velocidadMaxima :: Float -> Float -> Float
+velocidadMaxima velocidadInicial unTiempo = velocidadInicial + (unTiempo / 5)
+
+velocidadPromedio :: (Fractional a) => a -> a -> a
+velocidadPromedio unValor otroValor = (unValor + otroValor) / 2 --Da casi igual a [6 .. velocidadMaxima] / length de la lista
+
+--b
+pesas :: Float -> Ejercicio
+pesas unosKilos unosMinutos unaPersona
+  | unosMinutos > 10 = bajarDePeso (unosKilos * 0.1) unaPersona
+  | otherwise     = unaPersona
+
+--c
+colina :: Float -> Ejercicio
+colina unaInclinacion unosMinutos = bajarDePeso (2* unosMinutos * unaInclinacion)
+
+--d
+montaña :: Float -> Ejercicio
+montaña unaInclinacion unTiempo = (aumentarTonificacion 1 . sucesionDeColinas unaInclinacion (unTiempo/2))
+
+sucesionDeColinas :: Float -> Float -> Persona -> Persona
+sucesionDeColinas unaInclinacion mitadDeTiempo = (colina (unaInclinacion + 3) mitadDeTiempo . colina unaInclinacion mitadDeTiempo)
+
+aumentarTonificacion :: Int -> Persona -> Persona
+aumentarTonificacion unaCantidad = modificarTonificacion (+ unaCantidad)
+
+modificarTonificacion :: (Int -> Int) -> Persona -> Persona
+modificarTonificacion modificacion (unaEdad, unPeso, unaTonificacion) = (unaEdad, unPeso, modificacion unaTonificacion)

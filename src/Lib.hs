@@ -1,4 +1,9 @@
 module Lib () where
+pancho :: Persona
+pancho = ( 40, 120, 1)
+
+andres :: Persona
+andres = ( 22, 80, 6)
 
 --Punto 1:
 estaSaludable :: Persona -> Bool
@@ -90,3 +95,36 @@ aumentarTonificacion unaCantidad = modificarTonificacion (+ unaCantidad)
 
 modificarTonificacion :: (Int -> Int) -> Persona -> Persona
 modificarTonificacion modificacion (unaEdad, unPeso, unaTonificacion) = (unaEdad, unPeso, modificacion unaTonificacion)
+
+--Punto 4:
+--a
+type Rutina = (String, Float, [Ejercicio])
+
+hacerRutina :: Rutina -> Persona -> Persona
+hacerRutina (_, unTiempo, unosEjercicios) unaPersona = foldr (flip ($) (tiempoPorEjercicio unTiempo unosEjercicios)) unaPersona unosEjercicios
+
+tiempoPorEjercicio :: Float -> [Ejercicio] -> Float
+tiempoPorEjercicio unTiempo = ((unTiempo/) . fromIntegral .length)
+
+--Con recursividad:
+hacerRutinaRecursiva :: Rutina -> Persona -> Persona
+hacerRutinaRecursiva (unNombre , unTiempo, []) unaPersona = unaPersona
+hacerRutinaRecursiva (unNombre , unTiempo, (unEjercicio : restoDeEjercicios)) unaPersona = hacerRutinaRecursiva (unNombre, unTiempo, restoDeEjercicios) (unEjercicio (tiempoPorEjercicio unTiempo restoDeEjercicios) unaPersona)
+
+ejemploDeUso :: Persona
+ejemploDeUso = hacerRutina ("ejemplo", 500, [caminata, entrenamientoEnCinta, pesas 5, colina 10, montaña 10]) pancho
+
+--b
+type Resumen = (String, Float, Int)
+
+resumenDeRutina :: Rutina -> Persona -> Resumen
+resumenDeRutina unaRutina unaPersona = (construirResumen (nombre unaRutina) unaPersona . hacerRutina unaRutina) unaPersona
+
+construirResumen :: String -> Persona -> Persona -> Resumen
+construirResumen unNombre unaPersona otraPersona = (unNombre, deltaSegun peso unaPersona otraPersona, deltaSegun tonificacion unaPersona otraPersona)
+
+deltaSegun :: (Num a)=>(Persona -> a) -> Persona -> Persona -> a
+deltaSegun transformador estadoFinalUnaPersona estadoInicialUnaPersona = transformador estadoFinalUnaPersona - transformador estadoInicialUnaPersona
+
+nombre :: Rutina -> String
+nombre (unNombre, _ ,_) = unNombre
